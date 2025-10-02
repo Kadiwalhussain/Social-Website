@@ -24,6 +24,7 @@
         <span class="user">
             {% if request.user.is_authenticated %}
                 Hello {{ request.user.first_name|default:request.user.username }},
+                <a href="{% url 'account:password_change' %}">Change password</a> |
                 <form action="{% url 'account:logout' %}" method="post" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" style="background:none;border:0;color:inherit;cursor:pointer;padding:0;">Logout</button>
