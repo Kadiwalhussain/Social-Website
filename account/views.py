@@ -1,8 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
-from .forms import LoginForm, UserRegistrationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import LoginForm, UserRegistrationForm, \
+    UserEditForm, ProfileEditForm
+from .models import Profile
 
 
 @login_required
@@ -50,6 +53,9 @@ def register(request):
             # Save the User object
             new_user.save()
 
+            # Create the user profile
+            Profile.objects.create(user=new_user)
+
             return render(
                 request,
                 'account/register_done.html',
@@ -63,3 +69,35 @@ def register(request):
         'account/register.html',
         {'user_form': user_form}
     )
+
+
+@login_required
+def edit(request):
+    # Get or create profile for the user
+    try:
+        profile = request.user.profile
+    except Profile.DoesNotExist:
+        profile = Profile.objects.create(user=request.user)
+    
+    if request.method == 'POST':
+        user_form = UserEditForm(instance=request.user,
+                                 data=request.POST)
+        profile_form = ProfileEditForm(
+            instance=profile,
+            data=request.POST,
+            files=request.FILES)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Profile updated '
+                           'successfully')
+        else:
+            messages.error(request, 'Error updating your profile')
+    else:
+        user_form = UserEditForm(instance=request.user)
+        profile_form = ProfileEditForm(
+            instance=profile)
+    return render(request,
+                  'account/edit.html',
+                  {'user_form': user_form,
+                   'profile_form': profile_form})
