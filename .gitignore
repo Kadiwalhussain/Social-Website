@@ -11,6 +11,14 @@ media/
 *.log
 local_settings.py
 
+# Environment variables
+.env
+
+# SSL Certificates
+*.crt
+*.key
+*.pem
+
 # Virtualenvs (if any inside this folder)
 .venv/
 venv/
