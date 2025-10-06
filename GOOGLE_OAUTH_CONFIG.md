@@ -20,6 +20,9 @@ https://mysite.com:8000/social-auth/complete/google-oauth2/
 https://0.0.0.0:8000/social-auth/complete/google-oauth2/
 ```
 
+
+#currently it is not working...
+
 ### Also add Authorized JavaScript origins:
 
 ```
