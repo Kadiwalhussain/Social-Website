@@ -1,5 +1,7 @@
 # 🔧 IMPORTANT: Google Cloud Console Configuration
 
+##currently not working..... -> Soon updating
+
 ## ⚠️ CRITICAL STEP - Configure Redirect URIs
 
 For Google OAuth2 to work, you MUST add these redirect URIs in your Google Cloud Console:
