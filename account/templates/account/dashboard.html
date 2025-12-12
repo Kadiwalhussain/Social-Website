@@ -1,17 +1,239 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Dashboard{% endblock %}
 
+{% block hero %}{% endblock %}
+
 {% block content %}
-    <h1>Dashboard</h1>
-    
-    {% with total_images_created=request.user.images_created.count %}
-        <p>Welcome to your dashboard. You have bookmarked {{ total_images_created }} image{{ total_images_created|pluralize }}.</p>
-    {% endwith %}
-    
-    <p>Drag the following button to your bookmarks toolbar to bookmark images from other websites → <a href="javascript:{% include "bookmarklet_launcher.js" %}" class="button">Bookmark it</a></p>
-    
-    <p>
-        You can also <a href="{% url "account:edit" %}">edit your profile</a> or <a href="{% url "account:password_change" %}">change your password</a>.
-    </p>
+    <div class="modern-dashboard">
+        <!-- Welcome Header -->
+        <div class="dashboard-welcome">
+            <div class="welcome-content">
+                <h1 class="welcome-title">
+                    Welcome back, 
+                    <span class="username-highlight">{{ request.user.first_name|default:request.user.username }}</span>
+                </h1>
+                <p class="welcome-subtitle">Here's what's happening in your creative space</p>
+            </div>
+            <div class="welcome-avatar">
+                {% if request.user.profile.photo %}
+                    <img src="{{ request.user.profile.photo.url }}" alt="{{ request.user.username }}">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        {{ request.user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        {% with total_images=request.user.images_created.count total_followers=request.user.followers.count total_following=request.user.following.count %}
+        <div class="stats-overview">
+            <div class="stat-card stat-primary">
+                <div class="stat-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ total_images }}</div>
+                    <div class="stat-label">Image{{ total_images|pluralize }} Saved</div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-secondary">
+                <div class="stat-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ total_followers }}</div>
+                    <div class="stat-label">Follower{{ total_followers|pluralize }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-tertiary">
+                <div class="stat-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ total_following }}</div>
+                    <div class="stat-label">Following</div>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-main-grid">
+            <!-- Quick Actions Panel -->
+            <div class="dashboard-panel quick-actions-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Quick Actions</h2>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </div>
+                <div class="quick-actions-grid">
+                    <a href="{% url 'images:create' %}" class="action-card">
+                        <div class="action-icon-wrapper action-add">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </div>
+                        <div class="action-text">
+                            <h3>Add Image</h3>
+                            <p>Upload new content</p>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'images:list' %}" class="action-card">
+                        <div class="action-icon-wrapper action-browse">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </div>
+                        <div class="action-text">
+                            <h3>Browse Images</h3>
+                            <p>Explore collection</p>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'account:user_list' %}" class="action-card">
+                        <div class="action-icon-wrapper action-discover">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </div>
+                        <div class="action-text">
+                            <h3>Discover People</h3>
+                            <p>Find creators</p>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'account:edit' %}" class="action-card">
+                        <div class="action-icon-wrapper action-settings">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3"></path>
+                            </svg>
+                        </div>
+                        <div class="action-text">
+                            <h3>Edit Profile</h3>
+                            <p>Update settings</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bookmarklet Panel -->
+            <div class="dashboard-panel bookmarklet-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Bookmarklet</h2>
+                    <span class="panel-badge">NEW</span>
+                </div>
+                <div class="bookmarklet-content">
+                    <div class="bookmarklet-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <p class="bookmarklet-description">Drag this button to your bookmarks bar to save images from any website instantly</p>
+                    <a href="javascript:{% include "bookmarklet_launcher.js" %}" class="bookmarklet-button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        <span>Bookmark It</span>
+                    </a>
+                    <p class="bookmarklet-hint">💡 Click while browsing to capture images</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed -->
+        {% if request.user.following.all %}
+        <div class="dashboard-panel activity-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Recent Activity</h2>
+                <a href="{% url 'images:list' %}" class="view-all-link">
+                    View All
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+            </div>
+            <div class="activity-feed-grid">
+                {% for followed_user in request.user.following.all|slice:":6" %}
+                    {% for image in followed_user.images_created.all|slice:":1" %}
+                    <div class="activity-item-card">
+                        <div class="activity-image-wrapper">
+                            <img src="{{ image.image.url }}" alt="{{ image.title }}" class="activity-image">
+                            <div class="activity-overlay">
+                                <a href="{{ image.get_absolute_url }}" class="activity-overlay-btn">View</a>
+                            </div>
+                        </div>
+                        <div class="activity-meta">
+                            <div class="activity-user-info">
+                                {% if followed_user.profile.photo %}
+                                    <img src="{{ followed_user.profile.photo.url }}" alt="{{ followed_user.username }}" class="activity-user-avatar">
+                                {% else %}
+                                    <div class="activity-user-avatar-placeholder">
+                                        {{ followed_user.username|slice:":1"|upper }}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <a href="{% url 'account:user_detail' followed_user.username %}" class="activity-username">
+                                        {{ followed_user.get_full_name|default:followed_user.username }}
+                                    </a>
+                                    <p class="activity-time">{{ image.created|timesince }} ago</p>
+                                </div>
+                            </div>
+                            <h4 class="activity-title">{{ image.title|truncatewords:5 }}</h4>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="dashboard-panel empty-state-panel">
+            <div class="empty-state-content">
+                <div class="empty-state-icon">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <h3>Your Feed is Empty</h3>
+                <p>Start following people to see their bookmarks and creative activity here!</p>
+                <a href="{% url 'account:user_list' %}" class="primary-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    Discover People
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 {% endblock %}

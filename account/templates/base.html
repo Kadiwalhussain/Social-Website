@@ -1,61 +1,134 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{% block title %}{% endblock %}</title>
+    <meta charset="utf-8">
+    <title>{% block title %}Bookmarks{% endblock %} · Verdant Vault</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
     <link href="{% static "css/base.css" %}" rel="stylesheet">
 </head>
 <body>
-    <div id="header">
-        <span class="logo">Bookmarks</span>
-        {% if request.user.is_authenticated %}
-        <ul class="menu">
-            <li {% if section == "dashboard" %}class="selected"{% endif %}>
-                <a href="{% url 'account:dashboard' %}">My dashboard</a>
-            </li>
-            <li {% if section == "images" %}class="selected"{% endif %}>
-                <a href="{% url 'images:list' %}">Images</a>
-            </li>
-            <li {% if section == "people" %}class="selected"{% endif %}>
-                <a href="{% url 'account:user_list' %}">People</a>
-            </li>
-        </ul>
-        {% endif %}
-        <span class="user">
+    <div class="site-shell">
+        <header class="site-header">
+            <div class="brand-stack">
+                <span class="logo">Bookmarks</span>
+                <span class="tagline">white serenity, green momentum.</span>
+            </div>
             {% if request.user.is_authenticated %}
-                Hello {{ request.user.first_name|default:request.user.username }},
-                <a href="{% url 'account:password_change' %}">Change password</a> |
-                <form action="{% url 'account:logout' %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" style="background:none;border:0;color:inherit;cursor:pointer;padding:0;">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'account:login' %}">Log-in</a>
+            <nav class="primary-nav">
+                <a href="{% url 'account:dashboard' %}" {% if section == "dashboard" %}class="is-active"{% endif %}>Dashboard</a>
+                <a href="{% url 'images:list' %}" {% if section == "images" %}class="is-active"{% endif %}>Images</a>
+                <a href="{% url 'account:user_list' %}" {% if section == "people" %}class="is-active"{% endif %}>People</a>
+                <a href="{% url 'images:search' %}" {% if section == "search" %}class="is-active"{% endif %}>Search</a>
+            </nav>
             {% endif %}
-        </span>
-    </div>
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li class="{{ message.tags }}">
-            {{ message|safe }}
-            <a href="#" class="close">x</a>
-        </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <div id="content">
-        {% block content %}
+            <div class="auth-links">
+                {% if request.user.is_authenticated %}
+                    <span class="salutation">Hey {{ request.user.first_name|default:request.user.username }}</span>
+                    <a class="ghost-button" href="{% url 'account:password_change' %}">Change password</a>
+                    <form action="{% url 'account:logout' %}" method="post" class="logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="ghost-button">Logout</button>
+                    </form>
+                {% else %}
+                    <a class="ghost-button" href="{% url 'account:login' %}">Log in</a>
+                    <a class="primary-btn" href="{% url 'account:register' %}">Create free account</a>
+                {% endif %}
+            </div>
+        </header>
+
+        {% block hero %}
+        <section class="site-hero">
+            <div class="hero-content">
+                <p class="eyebrow">Visual bookmarking with calm energy</p>
+                <h1>Collect every spark in a crisp, white canvas with lush green accents.</h1>
+                <p class="hero-lede">Browse, save, and organize meaningful images in an airy layout crafted for focus and flow.</p>
+                <div class="hero-actions">
+                    {% if request.user.is_authenticated %}
+                        <a class="primary-btn" href="{% url 'account:dashboard' %}">Open dashboard</a>
+                        <a class="secondary-btn" href="{% url 'images:list' %}">See images</a>
+                    {% else %}
+                        <a class="primary-btn" href="{% url 'account:register' %}">Start collecting</a>
+                        <a class="secondary-btn" href="{% url 'account:login' %}">Log in</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="hero-stat-panel">
+                <div class="hero-stat-card">
+                    <p class="hero-stat-label">Fresh collections</p>
+                    <p class="hero-stat-value">Drag the bookmarklet to your toolbar</p>
+                    <p class="hero-stat-footnote">Clip wisdom from any corner of the web.</p>
+                </div>
+                <div class="hero-stat-card">
+                    <p class="hero-stat-label">Made for</p>
+                    {% if request.user.is_authenticated %}
+                        <p class="hero-stat-value">{{ request.user.get_full_name|default:request.user.username }}</p>
+                    {% else %}
+                        <p class="hero-stat-value">Your future self</p>
+                    {% endif %}
+                    <p class="hero-stat-footnote">Stay synchronized across every device.</p>
+                </div>
+            </div>
+        </section>
         {% endblock %}
+
+        <section class="feature-suite">
+            <article class="feature-card">
+                <span class="feature-pill">Images</span>
+                <h3>Light-filled galleries</h3>
+                <p>Save the images that move you, then explore them inside an airy, cream-white frame.</p>
+            </article>
+            <article class="feature-card">
+                <span class="feature-pill">People</span>
+                <h3>Kindred collectors</h3>
+                <p>Follow friends, admire their taste, and swap visual stories with people you trust.</p>
+            </article>
+            <article class="feature-card">
+                <span class="feature-pill">Bookmarklet</span>
+                <h3>One-click capture</h3>
+                <p>Drag the launcher and stay in flow—clip inspiration without breaking the mood.</p>
+            </article>
+        </section>
+
+        <main class="content-shell">
+            <section id="content" class="content-panel">
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li class="{{ message.tags }}">
+                        <span class="message-text">{{ message|safe }}</span>
+                        <button type="button" class="close" aria-label="Dismiss">×</button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <p>Bookmarks · Designed in white and green.</p>
+            <div class="footer-links">
+                <a href="#">Help</a>
+                <a href="#">Privacy</a>
+            </div>
+        </footer>
     </div>
+
     <script src="//cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <script>
-      const csrftoken = Cookies.get('csrftoken');
-      document.addEventListener('DOMContentLoaded', (event) => {
-        // DOM loaded
-        {% block domready %}
-        {% endblock %}
-      })
+        const csrftoken = Cookies.get('csrftoken');
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.messages .close').forEach((closeButton) => {
+                closeButton.addEventListener('click', () => {
+                    closeButton.closest('li').remove();
+                });
+            });
+            {% block domready %}
+            {% endblock %}
+        });
     </script>
 </body>
-</html>

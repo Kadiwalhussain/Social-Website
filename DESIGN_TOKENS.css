@@ -1,0 +1,228 @@
+/* 
+==============================================
+VERDANT VAULT - COLOR PALETTE & DESIGN TOKENS
+==============================================
+
+This file documents the complete design system used throughout the application.
+Copy these tokens if you need to extend the design or create new components.
+*/
+
+/* ==================
+   PRIMARY COLORS
+   ================== */
+:root {
+    /* Brand Green - Main color for buttons, links, highlights */
+    --green: #1f8b4c;
+    --green-dark: #0d5c2c;      /* Hover states, emphasis */
+    --green-soft: #dff4e4;      /* Backgrounds, subtle highlights */
+    
+    /* Neutrals */
+    --bg-snow: #f6f8f6;         /* Page background */
+    --text-dark: #111517;       /* Primary text */
+    --text-soft: #4c5550;       /* Secondary text, labels */
+    --white: #ffffff;           /* Cards, inputs */
+    
+    /* Shadows - For depth and elevation */
+    --shadow-soft: 0 20px 45px rgba(23, 35, 16, 0.15);
+    --shadow-card: 0 12px 35px rgba(17, 32, 25, 0.12);
+    --shadow-button: 0 8px 20px rgba(31, 139, 76, 0.3);
+    --shadow-button-hover: 0 12px 30px rgba(31, 139, 76, 0.4);
+}
+
+/* ==================
+   SEMANTIC COLORS
+   ================== */
+:root {
+    /* Status Colors */
+    --success-bg: #e4f7ec;
+    --success-text: #0d5c2c;
+    
+    --error-bg: #ffe8e6;
+    --error-text: #9b1b1f;
+    
+    --warning-bg: #fff3d0;
+    --warning-text: #8c4e05;
+    
+    --info-bg: #fef9db;
+    --info-text: #3d4934;
+    
+    /* Secondary Accent Colors (Dashboard stats) */
+    --blue: #3b82f6;
+    --blue-dark: #1e40af;
+    --blue-soft: #dbeafe;
+    
+    --purple: #8b5cf6;
+    --purple-dark: #6d28d9;
+    --purple-soft: #ede9fe;
+    
+    --red: #ef4444;
+    --red-dark: #dc2626;
+}
+
+/* ==================
+   TYPOGRAPHY
+   ================== */
+:root {
+    /* Font Families */
+    --font-primary: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display: 'Playfair Display', 'Times New Roman', serif;
+    
+    /* Font Sizes */
+    --text-xs: 0.75rem;     /* 12px */
+    --text-sm: 0.85rem;     /* 13.6px */
+    --text-base: 1rem;      /* 16px */
+    --text-lg: 1.1rem;      /* 17.6px */
+    --text-xl: 1.25rem;     /* 20px */
+    --text-2xl: 1.5rem;     /* 24px */
+    --text-3xl: 2rem;       /* 32px */
+    --text-4xl: 2.5rem;     /* 40px */
+    
+    /* Font Weights */
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+    
+    /* Line Heights */
+    --leading-tight: 1.2;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.7;
+}
+
+/* ==================
+   SPACING SCALE
+   ================== */
+:root {
+    --space-1: 0.25rem;    /* 4px */
+    --space-2: 0.5rem;     /* 8px */
+    --space-3: 0.75rem;    /* 12px */
+    --space-4: 1rem;       /* 16px */
+    --space-5: 1.25rem;    /* 20px */
+    --space-6: 1.5rem;     /* 24px */
+    --space-8: 2rem;       /* 32px */
+    --space-10: 2.5rem;    /* 40px */
+    --space-12: 3rem;      /* 48px */
+    --space-16: 4rem;      /* 64px */
+    --space-20: 5rem;      /* 80px */
+}
+
+/* ==================
+   BORDER RADIUS
+   ================== */
+:root {
+    --radius-sm: 8px;      /* Small elements */
+    --radius-md: 12px;     /* Inputs, small cards */
+    --radius-lg: 16px;     /* Cards, panels */
+    --radius-xl: 20px;     /* Large cards */
+    --radius-2xl: 24px;    /* Hero sections */
+    --radius-3xl: 32px;    /* Modal, auth cards */
+    --radius-full: 999px;  /* Pills, buttons */
+    --radius-circle: 50%;  /* Avatars, icons */
+}
+
+/* ==================
+   ANIMATIONS
+   ================== */
+:root {
+    /* Durations */
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+    
+    /* Easings */
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ==================
+   BREAKPOINTS
+   ================== */
+/*
+Mobile First Approach:
+
+Small Mobile:    < 480px   (base styles)
+Mobile:          480px+    (adjustments)
+Tablet:          768px+    (medium layouts)
+Desktop:         1024px+   (full layouts)
+Large Desktop:   1280px+   (wider content)
+*/
+
+/* ==================
+   Z-INDEX SCALE
+   ================== */
+:root {
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* ==================
+   USAGE EXAMPLES
+   ================== */
+
+/*
+Example: Creating a new button variant
+.btn-warning {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border-radius: var(--radius-full);
+    padding: var(--space-3) var(--space-5);
+    font-weight: var(--weight-semibold);
+    transition: all var(--duration-normal) var(--ease-in-out);
+}
+
+Example: Creating a new card
+.custom-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-card);
+    color: var(--text-dark);
+}
+
+Example: Responsive text
+.hero-title {
+    font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+}
+*/
+
+/* ==================
+   ACCESSIBILITY
+   ================== */
+/*
+- All colors meet WCAG AA contrast requirements
+- Focus states use 4px outline with brand color
+- Interactive elements have min 44x44px touch target
+- Reduced motion supported via prefers-reduced-motion
+*/
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==================
+   GRADIENT LIBRARY
+   ================== */
+:root {
+    /* Primary Gradients */
+    --gradient-green: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    
+    /* Subtle Backgrounds */
+    --gradient-soft: linear-gradient(135deg, #fff 0%, var(--green-soft) 100%);
+    --gradient-hero: linear-gradient(135deg, rgba(31, 139, 76, 0.08), rgba(255, 255, 255, 1));
+}

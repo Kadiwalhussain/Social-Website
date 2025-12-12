@@ -2,18 +2,67 @@
 
 {% block title %}{{ user.get_full_name|default:user.username }}{% endblock %}
 
+{% block hero %}{% endblock %}
+
 {% block content %}
-  <h1>{{ user.get_full_name|default:user.username }}</h1>
-  <div class="profile-info">
-    {% if user.profile.photo %}
-      <img src="{{ user.profile.photo.url }}" class="user-detail">
-    {% endif %}
+  <div class="user-profile-layout">
+    <div class="profile-header">
+      <div class="profile-info">
+        {% if user.profile.photo %}
+          <img src="{{ user.profile.photo.url }}" class="user-detail">
+        {% endif %}
+        <div class="profile-details">
+          <h1>{{ user.get_full_name|default:user.username }}</h1>
+          <p class="username">@{{ user.username }}</p>
+          
+          {% if user.profile.bio %}
+            <p class="bio">{{ user.profile.bio }}</p>
+          {% endif %}
+          
+          <div class="profile-meta">
+            {% if user.profile.location %}
+              <span class="meta-item">📍 {{ user.profile.location }}</span>
+            {% endif %}
+            {% if user.profile.website %}
+              <a href="{{ user.profile.website }}" target="_blank" class="meta-item">🔗 Website</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="profile-stats">
+        {% with total_images_created=user.images_created.count total_followers=user.followers.count total_following=user.following.count %}
+          <div class="stat">
+            <span class="stat-value">{{ total_images_created }}</span>
+            <span class="stat-label">Image{{ total_images_created|pluralize }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ total_followers }}</span>
+            <span class="stat-label">Follower{{ total_followers|pluralize }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ total_following }}</span>
+            <span class="stat-label">Following</span>
+          </div>
+        {% endwith %}
+      </div>
+      
+      {% if request.user != user and request.user.is_authenticated %}
+        <div class="profile-actions">
+          <a href="#" 
+             data-id="{{ user.id }}" 
+             data-action="{% if request.user in user.followers.all %}un{% endif %}follow" 
+             class="follow button primary-btn">
+            {% if request.user not in user.followers.all %}
+              Follow
+            {% else %}
+              Unfollow
+            {% endif %}
+          </a>
+        </div>
+      {% endif %}
+    </div>
   </div>
-  {% with total_images_created=user.images_created.count %}
-    <span class="count">
-      {{ total_images_created }} image{{ total_images_created|pluralize }} bookmarked
-    </span>
-  {% endwith %}
   
   {% if user.images_created.all %}
     <div class="image-container">
@@ -26,9 +75,44 @@
                 <img src="{{ image.image.url }}" alt="{{ image.title }}">
               {% endif %}
             </a>
+            <div class="info">
+              <a href="{{ image.get_absolute_url }}">{{ image.title }}</a>
+            </div>
           </div>
         {% endfor %}
       </div>
     </div>
   {% endif %}
+{% endblock %}
+
+{% block domready %}
+  const followButton = document.querySelector('a.follow');
+  if (followButton) {
+    const url = '{% url "account:user_follow" %}';
+    var options = {
+      method: 'POST',
+      headers: {'X-CSRFToken': csrftoken},
+      mode: 'same-origin'
+    }
+
+    followButton.addEventListener('click', function(e){
+      e.preventDefault();
+
+      var formData = new FormData();
+      formData.append('id', followButton.dataset.id);
+      formData.append('action', followButton.dataset.action);
+      options['body'] = formData;
+
+      fetch(url, options)
+      .then(response => response.json())
+      .then(data => {
+        if (data['status'] === 'ok') {
+          var previousAction = followButton.dataset.action;
+          var action = previousAction === 'follow' ? 'unfollow' : 'follow';
+          followButton.dataset.action = action;
+          followButton.innerHTML = action;
+        }
+      })
+    });
+  }
 {% endblock %}

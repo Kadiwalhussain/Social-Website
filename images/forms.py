@@ -2,7 +2,7 @@ from django import forms
 from django.core.files.base import ContentFile
 from django.utils.text import slugify
 import requests
-from .models import Image
+from .models import Image, Comment
 
 
 class ImageCreateForm(forms.ModelForm):
@@ -40,3 +40,18 @@ class ImageCreateForm(forms.ModelForm):
         if commit:
             image.save()
         return image
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['body']
+        widgets = {
+            'body': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Share your thoughts about this image...'
+            }),
+        }
+        labels = {
+            'body': '',
+        }

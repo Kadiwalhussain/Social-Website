@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Search Images{% endblock %}
+
+{% block hero %}{% endblock %}
+
+{% block content %}
+  <div class="search-header">
+    <h1>Search Images</h1>
+    <form method="get" class="search-form">
+      <input type="text" name="q" placeholder="Search by title, description, or username..." value="{{ query }}" class="search-input">
+      <input type="submit" value="Search" class="primary-btn">
+    </form>
+  </div>
+
+  {% if query %}
+    <div class="search-results-info">
+      <p>Found <strong>{{ images.paginator.count }}</strong> result{{ images.paginator.count|pluralize }} for "<strong>{{ query }}</strong>"</p>
+    </div>
+  {% endif %}
+
+  {% if images %}
+    <div id="image-list">
+      {% for image in images %}
+        <div class="image">
+          <a href="{{ image.get_absolute_url }}">
+            {% if image.image %}
+              <img src="{{ image.image.url }}" alt="{{ image.title }}">
+            {% endif %}
+          </a>
+          <div class="info">
+            <a href="{{ image.get_absolute_url }}">{{ image.title }}</a>
+            <p class="image-meta-small">by {{ image.user.username }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if images.has_other_pages %}
+      <div class="pagination">
+        {% if images.has_previous %}
+          <a href="?q={{ query }}&page={{ images.previous_page_number }}" class="secondary-btn">Previous</a>
+        {% endif %}
+        <span class="current-page">Page {{ images.number }} of {{ images.paginator.num_pages }}</span>
+        {% if images.has_next %}
+          <a href="?q={{ query }}&page={{ images.next_page_number }}" class="secondary-btn">Next</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% elif query %}
+    <p class="no-results">No images found matching your search.</p>
+  {% else %}
+    <p class="search-prompt">Enter a search term to find images.</p>
+  {% endif %}
+{% endblock %}

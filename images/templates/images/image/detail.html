@@ -2,41 +2,106 @@
 
 {% block title %}{{ image.title }}{% endblock %}
 
+{% block hero %}{% endblock %}
+
 {% block content %}
-  <h1>{{ image.title }}</h1>
-  <a href="{{ image.image.url }}">
-    <img src="{{ image.image.url }}" class="image-detail">
-  </a>
-  {% with total_likes=image.users_like.count users_like=image.users_like.all %}
-    <div class="image-info">
-      <div>
-        <span class="count">
-          <span class="total">{{ total_likes }}</span>
-          like{{ total_likes|pluralize }}
-        </span>
-        <a href="#" data-id="{{ image.id }}" data-action="{% if request.user in users_like %}un{% endif %}like" class="like button">
-          {% if request.user not in users_like %}
-            Like
-          {% else %}
-            Unlike
-          {% endif %}
-        </a>
-      </div>
-      {{ image.description|linebreaks }}
-    </div>
-    <div class="image-likes">
-      {% for user in users_like %}
-        <div>
-          {% if user.profile.photo %}
-            <img src="{{ user.profile.photo.url }}">
-          {% endif %}
-          <p>{{ user.first_name }}</p>
+  <div class="image-detail-layout">
+    <div class="image-detail-left">
+      <h1>{{ image.title }}</h1>
+      <a href="{{ image.image.url }}" target="_blank">
+        <img src="{{ image.image.url }}" class="image-detail">
+      </a>
+      
+      {% with total_likes=image.users_like.count users_like=image.users_like.all %}
+        <div class="image-info">
+          <div class="image-actions">
+            <span class="count">
+              <span class="total">{{ total_likes }}</span>
+              like{{ total_likes|pluralize }}
+            </span>
+            {% if request.user.is_authenticated %}
+            <a href="#" data-id="{{ image.id }}" data-action="{% if request.user in users_like %}un{% endif %}like" class="like button">
+              {% if request.user not in users_like %}
+                Like
+              {% else %}
+                Unlike
+              {% endif %}
+            </a>
+            {% endif %}
+          </div>
+          
+          <div class="image-meta">
+            <p><strong>Shared by:</strong> 
+              <a href="{% url 'account:user_detail' image.user.username %}">
+                {{ image.user.get_full_name|default:image.user.username }}
+              </a>
+            </p>
+            <p><strong>Created:</strong> {{ image.created }}</p>
+            {% if image.description %}
+              <p>{{ image.description|linebreaks }}</p>
+            {% endif %}
+          </div>
         </div>
-      {% empty %}
-        Nobody likes this image yet.
-      {% endfor %}
+        
+        <div class="image-likes">
+          <h3>Liked by</h3>
+          <div class="likes-grid">
+            {% for user in users_like %}
+              <div class="like-user">
+                <a href="{% url 'account:user_detail' user.username %}">
+                  {% if user.profile.photo %}
+                    <img src="{{ user.profile.photo.url }}" alt="{{ user.username }}">
+                  {% endif %}
+                  <p>{{ user.first_name|default:user.username }}</p>
+                </a>
+              </div>
+            {% empty %}
+              <p class="muted">Nobody has liked this image yet.</p>
+            {% endfor %}
+          </div>
+        </div>
+      {% endwith %}
     </div>
-  {% endwith %}
+    
+    <div class="image-detail-right">
+      <div class="comments-section">
+        <h2>Comments ({{ comments.count }})</h2>
+        
+        {% if request.user.is_authenticated %}
+        <div class="comment-form-wrapper">
+          <form method="post" class="comment-form">
+            {{ comment_form.as_p }}
+            {% csrf_token %}
+            <input type="submit" value="Post Comment" class="primary-btn">
+          </form>
+        </div>
+        {% else %}
+        <p class="muted">Please <a href="{% url 'account:login' %}">log in</a> to comment.</p>
+        {% endif %}
+        
+        <div class="comments-list">
+          {% for comment in comments %}
+            <div class="comment">
+              <div class="comment-header">
+                <a href="{% url 'account:user_detail' comment.user.username %}" class="comment-author">
+                  {% if comment.user.profile.photo %}
+                    <img src="{{ comment.user.profile.photo.url }}" alt="{{ comment.user.username }}" class="comment-avatar">
+                  {% endif %}
+                  <strong>{{ comment.user.get_full_name|default:comment.user.username }}</strong>
+                </a>
+                <span class="comment-date">{{ comment.created|timesince }} ago</span>
+              </div>
+              <div class="comment-body">
+                {{ comment.body|linebreaks }}
+              </div>
+            </div>
+          {% empty %}
+            <p class="muted">No comments yet. Be the first to share your thoughts!</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block domready %}

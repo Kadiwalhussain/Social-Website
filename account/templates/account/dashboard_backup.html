@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block hero %}{% endblock %}
+
+{% block content %}
+    <div class="dashboard-layout">
+        <div class="dashboard-header">
+            <h1>Welcome back, {{ request.user.first_name|default:request.user.username }}!</h1>
+            <p class="dashboard-subtitle">Here's what's happening in your network</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card stats-card">
+                <h3>Your Stats</h3>
+                {% with total_images=request.user.images_created.count total_followers=request.user.followers.count total_following=request.user.following.count %}
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_images }}</span>
+                        <span class="stat-label">Image{{ total_images|pluralize }} bookmarked</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_followers }}</span>
+                        <span class="stat-label">Follower{{ total_followers|pluralize }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_following }}</span>
+                        <span class="stat-label">Following</span>
+                    </div>
+                </div>
+                {% endwith %}
+            </div>
+
+            <div class="dashboard-card quick-actions-card">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <a href="{% url 'images:create' %}" class="action-btn">
+                        <span class="action-icon">📷</span>
+                        <span>Add New Image</span>
+                    </a>
+                    <a href="{% url 'images:list' %}" class="action-btn">
+                        <span class="action-icon">🖼️</span>
+                        <span>Browse Images</span>
+                    </a>
+                    <a href="{% url 'account:user_list' %}" class="action-btn">
+                        <span class="action-icon">👥</span>
+                        <span>Discover People</span>
+                    </a>
+                    <a href="{% url 'account:edit' %}" class="action-btn">
+                        <span class="action-icon">⚙️</span>
+                        <span>Edit Profile</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="dashboard-card bookmarklet-card">
+                <h3>Bookmarklet</h3>
+                <p>Drag this button to your bookmarks bar to save images from any website:</p>
+                <div class="bookmarklet-wrapper">
+                    <a href="javascript:{% include "bookmarklet_launcher.js" %}" class="button bookmarklet-btn">
+                        ⭐ Bookmark It
+                    </a>
+                </div>
+                <p class="help-text">Click it while browsing to instantly save images to your collection.</p>
+            </div>
+        </div>
+
+        {% if request.user.following.all %}
+        <div class="dashboard-section">
+            <h2>Recent Activity</h2>
+            <div class="activity-feed">
+                {% for followed_user in request.user.following.all|slice:":5" %}
+                    {% for image in followed_user.images_created.all|slice:":2" %}
+                    <div class="activity-item">
+                        <div class="activity-avatar">
+                            {% if followed_user.profile.photo %}
+                                <img src="{{ followed_user.profile.photo.url }}" alt="{{ followed_user.username }}">
+                            {% endif %}
+                        </div>
+                        <div class="activity-content">
+                            <p class="activity-text">
+                                <a href="{% url 'account:user_detail' followed_user.username %}" class="activity-user">
+                                    {{ followed_user.get_full_name|default:followed_user.username }}
+                                </a>
+                                bookmarked a new image
+                            </p>
+                            <a href="{{ image.get_absolute_url }}" class="activity-image-link">
+                                <img src="{{ image.image.url }}" alt="{{ image.title }}" class="activity-image">
+                                <span class="activity-image-title">{{ image.title }}</span>
+                            </a>
+                            <p class="activity-time">{{ image.created|timesince }} ago</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% empty %}
+                    <p class="no-activity">Follow people to see their activity here!</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="dashboard-section">
+            <div class="empty-state">
+                <h3>Your feed is empty</h3>
+                <p>Start following people to see their bookmarks and activity!</p>
+                <a href="{% url 'account:user_list' %}" class="primary-btn">Discover People</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

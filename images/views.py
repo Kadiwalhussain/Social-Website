@@ -4,8 +4,9 @@ from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
-from .forms import ImageCreateForm
-from .models import Image
+from django.db.models import Q
+from .forms import ImageCreateForm, CommentForm
+from .models import Image, Comment
 
 
 @login_required
@@ -36,10 +37,27 @@ def image_create(request):
 
 def image_detail(request, id, slug):
     image = get_object_or_404(Image, id=id, slug=slug)
+    comments = image.comments.filter(active=True)
+    comment_form = None
+    
+    if request.method == 'POST':
+        comment_form = CommentForm(data=request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.image = image
+            new_comment.user = request.user
+            new_comment.save()
+            messages.success(request, 'Comment added successfully')
+            return redirect(image.get_absolute_url())
+    else:
+        comment_form = CommentForm()
+    
     return render(request,
                   'images/image/detail.html',
                   {'section': 'images',
-                   'image': image})
+                   'image': image,
+                   'comments': comments,
+                   'comment_form': comment_form})
 
 
 @login_required
@@ -87,3 +105,31 @@ def image_like(request):
         except Image.DoesNotExist:
             pass
     return JsonResponse({'status': 'error'})
+
+
+@login_required
+def image_search(request):
+    query = request.GET.get('q', '')
+    images = Image.objects.none()
+    
+    if query:
+        images = Image.objects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(user__username__icontains=query)
+        ).distinct()
+    
+    paginator = Paginator(images, 8)
+    page = request.GET.get('page')
+    try:
+        images = paginator.page(page)
+    except PageNotAnInteger:
+        images = paginator.page(1)
+    except EmptyPage:
+        images = paginator.page(paginator.num_pages)
+    
+    return render(request,
+                  'images/image/search.html',
+                  {'section': 'images',
+                   'images': images,
+                   'query': query})
